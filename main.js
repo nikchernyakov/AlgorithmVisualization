@@ -3,7 +3,10 @@ window.onload = function () {
     var WHITE_COLOR = "#f3f3f3",
         BLACK_COLOR = "#000",
         CURRENT_VERTEX_COLOR = "#ff3300",
+        CURRENT_EDGE_COLOR = "#ff3300",
         VISIT_VERTEX_COLOR = "#808080",
+        VISIT_EDGE_COLOR = "#808080",
+        ADJACENCY_VERTEX_COLOR = "#ffffcc",
         START_VERTEX_COLOR = "#00ff00",
         DEFAULT_VERTEX_COLOR = "#f3f3f3",
         DEFAULT_EDGE_COLOR = "#000";
@@ -164,6 +167,7 @@ window.onload = function () {
 
           setNodeColor: function (ind, color) {
               this.nodes[ind].color = color;
+              render();
           },
 
           /*createEdge: function(from, to, weight) {
@@ -185,9 +189,14 @@ window.onload = function () {
                   weight: Number(weight)
               }
           },
+
+          getEdge: function (ind) {
+              return this.nodes[ind];
+          },
           
           setEdgeColor: function (ind, color) {
               this.edges[ind].color = color;
+              render();
           }
 
       };
@@ -487,7 +496,7 @@ window.onload = function () {
         }
 
         return (min < Number.MAX_VALUE) ? index : false;
-    }
+    };
 
     var nextStep,
         nextTimer,
@@ -498,9 +507,9 @@ window.onload = function () {
         currentVertex,
         edges;
 
-    nextStep = function (func, timeInSec) {
+    nextStep = function (func, timeInSec, edge, prevColor) {
         if(isPauseOrStop(func)) return;
-        nextTimer = setTimeout(func, timeInSec*1000*(1/speed));
+        nextTimer = setTimeout(func, timeInSec*1000*(1/speed), edge, prevColor);
     };
 
     isPauseOrStop = function (func) {
@@ -547,8 +556,7 @@ window.onload = function () {
             edges.push(graph.createEdge(edge.from, edge.to, edge.weight, edge.id));
         });
 
-        sendInfo("Run for all edges from vertex <b>" + currentVertex + "</b>...");
-        render();
+        sendInfo("Run for all not visited edges from vertex <b>" + currentVertex + "</b>...");
         nextStep(checkEdgesStep, 3);
     };
 
@@ -564,26 +572,39 @@ window.onload = function () {
 
     var checkEdgeStep = function () {
         var edge = edges.pop();
+        if(flags[edge.to]){
+            nextStep(checkEdgesStep, 3);
+            return;
+        }
         sendInfo("Edge from <b>" + edge.from + "</b> to <b>" + edge.to + "</b> with weight <b>" + edge.weight + "</b>");
-        var newWeight = Number(distances[currentVertex]) + Number(edge.weight);
-        if(newWeight < distances[edge.to]) {
-            var message = "Distance from this edge less then previous edge <b>" + newWeight + " < ";
+        var prevColor = graph.getNode(edge.to).color;
+        graph.setNodeColor(edge.to, ADJACENCY_VERTEX_COLOR);
+        nextStep(checkDistancesStep, 3, edge, prevColor);
+    };
+
+    var checkDistancesStep = function (edge, prevColor) {
+        var newDistance = Number(distances[currentVertex]) + Number(edge.weight);
+        if(newDistance < distances[edge.to]) {
+            var message = "Distance from this edge less then previous edge: <b>" + newDistance + " < ";
             message += distances[edge.to] !== Number.MAX_VALUE ? distances[edge.to].toString() : INFINITY_CHAR;
             sendInfo(message + "</b>");
-            setDistance(edge.to, newWeight);
+            setDistance(edge.to, newDistance);
             setPrevVertex(edge.to, edge.from);
             if(edgesIdToPrevVertex[edge.to] !== undefined)
-                graph.setEdgeColor(edgesIdToPrevVertex[edge.to], VISIT_VERTEX_COLOR);
+                graph.setEdgeColor(edgesIdToPrevVertex[edge.to], VISIT_EDGE_COLOR);
             edgesIdToPrevVertex[edge.to] = edge.id;
-            graph.setEdgeColor(edge.id, CURRENT_VERTEX_COLOR);
-            render();
+            graph.setEdgeColor(edge.id, CURRENT_EDGE_COLOR);
+        } else{
+            sendInfo("Distance from this edge more then previous edge: <b>" +
+                + newDistance + " >= " + distances[edge.to].toString());
+            graph.setEdgeColor(edge.id, VISIT_EDGE_COLOR);
         }
+        graph.setNodeColor(edge.to, prevColor);
         nextStep(checkEdgesStep, 3);
     };
 
     var endDijkstra = function () {
         sendInfo("The algorithm is done working");
-        render();
     };
 
     render();
