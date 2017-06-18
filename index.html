@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Algorithm Dijkstra</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <script src="main.js"></script>
+</head>
+<body>
+    <header><h1 id="header">Visualisation of Algorithm Dijkstra</h1></header>
+    <div class="sections" id="graph_div">
+        <header><h2> Graph section </h2></header>
+        <button class="button" id="btnView">View</button>
+        <button class="button" id="btnCreateVertex">Create vertex</button>
+        <button class="button" id="btnCreateEdge">Create edge</button>
+        <button class="button" id="btnClearGraph">Clear</button>
+        <button class="button" id="btnCreateRandomGraph">Random Graph</button>
+    </div>
+
+    <canvas id="canvas" width="640" height="480"> Update your browser </canvas>
+
+    <div class="sections" id="algorithm_div">
+        <header><h2> Algorithm section </h2></header>
+        <button class="button" id="btnWork">Start</button>
+        <button class="button" id="btnStop">Stop</button>
+        <button class="button" id="btnSelectStartVertex">Select start vertex</button>
+        <div class="inners">
+            <h3>Distances</h3>
+            <table id="distances">
+                <tr id="tr_id">
+                    <th><b>Vertex ID</b></th>
+                </tr>
+                <tr id="tr_distances">
+                    <th><b>Distance</b></th>
+                </tr>
+                <tr id="tr_prev_vertex">
+                    <th><b>PrevVertex</b></th>
+                </tr>
+            </table>
+        </div>
+        <div class="inners">
+            <h3>Info</h3>
+            <p id="info_field">
+                Here you will be able to see information about algorithm work process...
+            </p>
+        </div>
+    </div>
+</body>
+</html>
