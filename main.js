@@ -8,8 +8,7 @@ window.onload = function () {
         DEFAULT_VERTEX_COLOR = "#f3f3f3",
         DEFAULT_EDGE_COLOR = "#000";
 
-    var nextStep,
-        speed = 1,
+    var speed = 1,
         canvas,
         ctx,
         graph,
@@ -18,11 +17,6 @@ window.onload = function () {
         dragPoint,
         firstSelectedNode = undefined,
         startVertex = undefined;
-
-    nextStep = function (func, timeInSec) {
-        if(isPauseOrStop(func)) return;
-        setTimeout(func, timeInSec*1000*(1/speed));
-    };
 
     var idRow,
         distancesRow,
@@ -74,7 +68,7 @@ window.onload = function () {
     btnWork = document.getElementById("btnWork");
     btnWork.disabled = true;
     btnWork.addEventListener("click", function (event) {
-        if(!isPaused || isStopped) currentStep = startDijkstra();
+        if(!isPaused || isStopped) currentStep = startDijkstra;
         btnStop.disabled = false;
         isStopped = false;
         isPaused = false;
@@ -472,15 +466,15 @@ window.onload = function () {
     var INFINITY_CHAR = "&#8734";
 
     var setDistance = function(ind, num) {
-        distancesRow.cells[ind + 1].innerHTML = num !== Number.MAX_VALUE ? num.toString() : String(INFINITY_CHAR);
-        distances[ind] = num;
+        distancesRow.cells[ind + 1].innerHTML = num !== Number.MAX_VALUE ? num.toString() : INFINITY_CHAR;
+        distances[ind] = Number(num);
     };
 
     var setPrevVertex = function(to, from) {
         prevVertexRow.cells[to + 1].innerHTML = from.toString();
     };
 
-    function getMinVertex() {
+    var getMinVertex = function() {
         var min = Number.MAX_VALUE;
         var index = -1;
 
@@ -494,12 +488,19 @@ window.onload = function () {
         return (min < Number.MAX_VALUE) ? index : false;
     }
 
-    var currentStep,
+    var nextStep,
+        nextTimer,
+        currentStep,
         isStopped = false,
         isPaused = false,
         isPauseOrStop,
         currentVertex,
         edges;
+
+    nextStep = function (func, timeInSec) {
+        if(isPauseOrStop(func)) return;
+        nextTimer = setTimeout(func, timeInSec*1000*(1/speed));
+    };
 
     isPauseOrStop = function (func) {
         currentStep = func;
@@ -515,7 +516,7 @@ window.onload = function () {
     var setFirstDistances = function () {
         if(isPauseOrStop(setFirstDistances)) return;
         sendInfo("Set starting value of distances to all vertices<br>" +
-            "For starting vertex the value is 0 to another vertices INFINITY");
+            "For starting vertex the value is <b>0</b> to another vertices <b>INFINITY</b>");
         for(var i = 0; i < graph.nodes.length; i++){
             setDistance(i, Number.MAX_VALUE);
             edgesIdToPrevVertex[i] = undefined;
@@ -538,7 +539,7 @@ window.onload = function () {
             return;
         }
         sendInfo("Choosing the vertex with minimal distance...<br>" +
-            "ID of vertex with minimal distance is: " + currentVertex);
+            "ID of vertex with minimal distance is: <b>" + currentVertex + "</b>");
         flags[currentVertex] = true;
         graph.setNodeColor(currentVertex, CURRENT_VERTEX_COLOR);
 
@@ -547,7 +548,7 @@ window.onload = function () {
             edges.push(graph.createEdge(edge.from, edge.to, edge.weight, edge.id));
         });
 
-        sendInfo("Run for all edges from vertex " + currentVertex + "...");
+        sendInfo("Run for all edges from vertex <b>" + currentVertex + "</b>...");
         render();
         nextStep(checkEdgesStep, 3);
     };
@@ -566,12 +567,12 @@ window.onload = function () {
     var checkEdgeStep = function () {
         if(isPauseOrStop(checkEdgeStep)) return;
         var edge = edges.pop();
-        sendInfo("Edge from " + edge.from + " to " + edge.to + " with weight " + edge.weight);
+        sendInfo("Edge from <b>" + edge.from + "</b> to <b>" + edge.to + "</b> with weight <b>" + edge.weight + "</b>");
         var newWeight = Number(distances[currentVertex]) + Number(edge.weight);
         if(newWeight < distances[edge.to]) {
-            sendInfo("Distance from this edge less then previous edge " + newWeight + " < " +
-                + ((distances[edge.to] !== Number.MAX_VALUE)
-                    ? distances[edge.to].toString() : "INFINITY"));
+            var message = "Distance from this edge less then previous edge <b>" + newWeight + " < ";
+            message += distances[edge.to] !== Number.MAX_VALUE ? distances[edge.to].toString() : INFINITY_CHAR;
+            sendInfo(message + "</b>");
             setDistance(edge.to, newWeight);
             setPrevVertex(edge.to, edge.from);
             if(edgesIdToPrevVertex[edge.to] !== undefined)
