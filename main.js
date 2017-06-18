@@ -42,6 +42,7 @@ window.onload = function () {
     };
 
     var currentBtn,
+        prevStyle,
         btnCreateVertex,
         btnCreateEdge,
         btnStart,
@@ -138,19 +139,25 @@ window.onload = function () {
         createRandomGraph();
     }, false);
 
+    var setStyleOfCurrentButton = function (btn) {
+        prevStyle = btn.style;
+        btn.style.backgroundColor = "#ffffff";
+        btn.style.border = "2px solid #589ba4";
+        btn.cssText += "-webkit-transition-duration: 0s; transition-duration: 0s;";
+    };
+
     currentBtn = btnView;
-    currentBtn.disabled = true;
+    setStyleOfCurrentButton(currentBtn);
+
 
     var changeCurrentButton = function (button) {
-
         if(firstSelectedNode !== undefined) firstSelectedNode.node.color = firstSelectedNode.prevColor;
         firstSelectedNode = undefined;
-
-        currentBtn.disabled = false;
-        button.disabled = true;
-        currentBtn = button;
-
         render();
+
+        currentBtn.style = prevStyle;
+        currentBtn = button;
+        setStyleOfCurrentButton(currentBtn);
     };
 
     var clearGraph = function () {
@@ -213,10 +220,6 @@ window.onload = function () {
                   to: Number(to),
                   weight: Number(weight)
               }
-          },
-
-          getEdge: function (ind) {
-              return this.nodes[ind];
           },
           
           setEdgeColor: function (ind, color) {
@@ -313,7 +316,7 @@ window.onload = function () {
     // запоминаем его в dragNode для дальнейшего использования,
     // в dragPoint запоминаем по какому месту узла была нажата кнопка мыши.
     canvas.addEventListener('mousedown', function (event) {
-        if (!btnView.disabled) {
+        if (currentBtn !== btnView) {
             return;
         }
         var pos = getMousePosFromEvent(event);
@@ -344,14 +347,14 @@ window.onload = function () {
 
     canvas.addEventListener('click', function (event) {
         var pos = getMousePosFromEvent(event);
-        switch (true) {
-            case btnCreateVertex.disabled:
+        switch (currentBtn.id) {
+            case "btnCreateVertex":
                 createVertex(pos);
                 break;
-            case btnCreateEdge.disabled:
+            case "btnCreateEdge":
                 createEdge(pos);
                 break;
-            case btnSelectStartVertex.disabled:
+            case "btnSelectStartVertex":
                 selectStartVertex(pos);
                 break;
             default:
