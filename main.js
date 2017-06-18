@@ -51,7 +51,8 @@ window.onload = function () {
         btnView,
         btnClearGraph,
         btnSelectStartVertex,
-        btnCreateRandomGraph;
+        btnCreateRandomGraph,
+        graphBtns;
 
     btnCreateVertex = document.getElementById('btnCreateVertex');
     btnCreateVertex.addEventListener("click", function (event) {
@@ -111,6 +112,7 @@ window.onload = function () {
         isPaused = false;
         btnStart.disabled = false;
         clearAlgorithmInfo();
+        setGraphBtnsDisabledProperty(false);
         render();
     }, false);
 
@@ -138,6 +140,22 @@ window.onload = function () {
     btnCreateRandomGraph.addEventListener("click", function (event) {
         createRandomGraph();
     }, false);
+
+    graphBtns = [btnView, btnCreateVertex, btnCreateEdge, btnCreateRandomGraph, btnClearGraph];
+
+    var setGraphBtnsDisabledProperty = function(bool) {
+        graphBtns.forEach(function(btn) {
+            btn.disabled = bool;
+        });
+        if(bool){
+            currentBtn.style = prevStyle;
+            btnSelectStartVertex.style.visibility = "hidden";
+        }
+        else {
+            btnSelectStartVertex.style.visibility = "visible";
+            setStyleOfCurrentButton(currentBtn);
+        }
+    };
 
     var setStyleOfCurrentButton = function (btn) {
         prevStyle = btn.style;
@@ -552,6 +570,7 @@ window.onload = function () {
     };
 
     var startDijkstra = function() {
+        setGraphBtnsDisabledProperty(true);
         clearAlgorithmInfo();
         sendInfo("Start algorithm...");
         nextStep(setFirstDistances, 1);
