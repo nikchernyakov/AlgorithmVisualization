@@ -11,8 +11,7 @@ window.onload = function () {
         DEFAULT_VERTEX_COLOR = "#f3f3f3",
         DEFAULT_EDGE_COLOR = "#000";
 
-    var speed = 1,
-        canvas,
+    var canvas,
         ctx,
         graph,
         render,
@@ -40,7 +39,8 @@ window.onload = function () {
     var currentBtn,
         btnCreateVertex,
         btnCreateEdge,
-        btnWork,
+        btnStart,
+        btnPause,
         btnStop,
         btnView,
         btnClearGraph,
@@ -68,14 +68,32 @@ window.onload = function () {
         render();
     }, false);
 
-    btnWork = document.getElementById("btnWork");
-    btnWork.disabled = true;
-    btnWork.addEventListener("click", function (event) {
-        if(!isPaused || isStopped) currentStep = startDijkstra;
+    btnStart = document.getElementById("btnStart");
+    btnStart.disabled = true;
+    btnStart.addEventListener("click", function (event) {
+        currentStep = startDijkstra;
         btnStop.disabled = false;
+        btnPause.disabled = false;
+        btnStart.disabled = true;
         isStopped = false;
         isPaused = false;
         nextStep(currentStep, 1);
+    }, false);
+
+    btnPause = document.getElementById("btnPause");
+    btnPause.disabled = true;
+    btnPause.addEventListener("click", function (event) {
+        if(isPaused){
+            isPaused = false;
+            btnStart.disabled = false;
+            nextStep(currentStep, 1);
+            btnPause.innerHTML = "Pause";
+        } else{
+            isPaused = true;
+            btnStart.disabled = true;
+            btnPause.innerHTML = "Continue";
+            clearTimeout(nextStep);
+        }
     }, false);
 
     btnStop = document.getElementById("btnStop");
@@ -84,6 +102,8 @@ window.onload = function () {
         clearTimeout(nextTimer);
         isStopped = true;
         btnStop.disabled = true;
+        isPaused = false;
+        btnStart.disabled = false;
         clearAlgorithmInfo();
         render();
     }, false);
@@ -131,7 +151,7 @@ window.onload = function () {
     var clearGraph = function () {
         graph = Graph();
         startVertex = undefined;
-        btnWork.disabled = true;
+        btnStart.disabled = true;
 
         [idRow, distancesRow, prevVertexRow].forEach(function(row) {
             for(var i = row.cells.length - 1 ; i >= 1; i--){
@@ -344,7 +364,6 @@ window.onload = function () {
 
         graph.nodes.push(graph.createNode(pos, id));
     };
-
     
     var addEdgeToGraph = function (from, to, weight) {
         var edge1 = graph.createEdge(from, to, Number(weight), graph.edges.length),
@@ -386,7 +405,7 @@ window.onload = function () {
         startVertex = getNodeByPos(pos);
         if(startVertex === undefined) return;
         startVertex.color = START_VERTEX_COLOR;
-        btnWork.disabled = false;
+        btnStart.disabled = false;
     };
 
     var createRandomGraph = function () {
@@ -498,7 +517,9 @@ window.onload = function () {
         return (min < Number.MAX_VALUE) ? index : false;
     };
 
-    var nextStep,
+    var speedSelect,
+        getSpeed,
+        nextStep,
         nextTimer,
         currentStep,
         isStopped = false,
@@ -507,9 +528,14 @@ window.onload = function () {
         currentVertex,
         edges;
 
+    speedSelect = document.getElementById("speed_select");
+    getSpeed = function () {
+        return Number(speedSelect.options[speedSelect.options.selectedIndex].value);
+    };
+
     nextStep = function (func, timeInSec, edge, prevColor) {
         if(isPauseOrStop(func)) return;
-        nextTimer = setTimeout(func, timeInSec*1000*(1/speed), edge, prevColor);
+        nextTimer = setTimeout(func, timeInSec*1000*(1/getSpeed()), edge, prevColor);
     };
 
     isPauseOrStop = function (func) {
@@ -605,6 +631,11 @@ window.onload = function () {
 
     var endDijkstra = function () {
         sendInfo("The algorithm is done working");
+        btnStart.disabled = false;
+        btnStop.disabled = true;
+        isStopped = false;
+        btnPause.disabled = true;
+        isPaused = false;
     };
 
     render();

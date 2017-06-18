@@ -7,9 +7,9 @@
     <script src="main.js"></script>
 </head>
 <body>
-    <header><h1 id="header">Visualisation of Algorithm Dijkstra</h1></header>
+    <header class="page_header"><h1 id="header">Visualisation of Algorithm Dijkstra</h1></header>
     <div class="sections" id="graph_div">
-        <header><h2> Graph section </h2></header>
+        <header class="section_header"><h2> Graph section </h2></header>
         <button class="button" id="btnView">View</button>
         <button class="button" id="btnCreateVertex">Create vertex</button>
         <button class="button" id="btnCreateEdge">Create edge</button>
@@ -17,14 +17,25 @@
         <button class="button" id="btnCreateRandomGraph">Random Graph</button>
     </div>
 
-    <canvas id="canvas" width="640" height="480"> Update your browser </canvas>
-
+    <div class="sections" id="canvas_div">
+        <header class="section_header"><h2> Canvas section </h2></header>
+        <canvas id="canvas" width="640" height="480"> Update your browser </canvas>
+    </div>
     <div class="sections" id="algorithm_div">
-        <header><h2> Algorithm section </h2></header>
-        <button class="button" id="btnWork">Start</button>
+        <header class="section_header"><h2> Algorithm section </h2></header>
+        <button class="button" id="btnStart">Start</button>
+        <button class="button" id="btnPause">Pause</button>
         <button class="button" id="btnStop">Stop</button>
         <button class="button" id="btnSelectStartVertex">Select start vertex</button>
-        <div class="inners">
+        <select id="speed_select">
+            <optgroup label="Speed">
+                <option value="0.5">0.5x</option>
+                <option selected value="1">1x</option>
+                <option value="2">2x</option>
+            </optgroup>
+        </select>
+
+            <div class="inners">
             <h3>Distances</h3>
             <table id="distances">
                 <tr id="tr_id">
