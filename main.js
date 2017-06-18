@@ -1,14 +1,19 @@
 window.onload = function () {
 
-    var WHITE_COLOR = "#f3f3f3",
+    var COLOR_1 = "#1093a7",
+        COLOR_2 = "#24454c",
+        COLOR_3 = "#def2f3",
+        COLOR_4 = "#589ba4",
+        WHITE_COLOR = "#ffffff",
         BLACK_COLOR = "#000",
         CURRENT_VERTEX_COLOR = "#ff3300",
         CURRENT_EDGE_COLOR = "#ff3300",
+        DISABLED_COLOR = "#808080",
         VISIT_VERTEX_COLOR = "#808080",
         VISIT_EDGE_COLOR = "#808080",
         ADJACENCY_VERTEX_COLOR = "#ffffcc",
         START_VERTEX_COLOR = "#00ff00",
-        DEFAULT_VERTEX_COLOR = "#f3f3f3",
+        DEFAULT_VERTEX_COLOR = "#ffffff",
         DEFAULT_EDGE_COLOR = "#000";
 
     var canvas,

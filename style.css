@@ -1,16 +1,36 @@
 body {
-    background: lightgrey;
-    align-content: center;
+    background: #1093a7;
+    margin: 0;
 }
 
-#header {
+#up_line {
+    position: absolute;
+    height: 30vh;
+    width: 100vw;
+    z-index: -1;
+    background-color: #24454c;
+    overflow: auto;
+    overflow-x: hidden;
+}
 
+h2 header.section_header {
+    margin: 10px;
+}
+
+header.page_header{
+    margin: auto;
+    text-align: center;
+    color: #ffffff;
+}
+
+header {
+    color: #24454c;
 }
 
 .button {
-    background-color: #4CAF50;
+    background-color: #589ba4;
     border: none;
-    color: white;
+    color: #000;
     padding: 15px 32px;
     text-align: center;
     text-decoration: none;
@@ -18,6 +38,31 @@ body {
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
+    border-radius: 4px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+
+.button:hover {
+    background-color: white;
+    border: 2px solid #589ba4;
+}
+
+#btnStart{
+    background-color: #00ff00;
+    color: #24454c;
+}
+
+#btnPause{
+    background-color: #ffff00;
+}
+
+#btnStop{
+    background-color: #ff3300;
+}
+
+#btnSelectStartVertex{
+    border-radius: 8px;
 }
 
 th {
@@ -26,10 +71,12 @@ th {
 }
 
 div.sections {
-    background-color: aliceblue;
+    margin-top: 15vh;
+    float: left;
+    background-color: #def2f3;
     text-align: center;
     border: 1px solid black;
-    height: 480px;
+    height: 100vh;
 }
 
 div.inners {
@@ -38,13 +85,18 @@ div.inners {
 }
 
 #graph_div {
-    float: left;
     max-width: 200px;
+    width: 20vw;
+    margin-left: 6vw;
+}
+
+#canvas_div{
+    width: 45vw;
 }
 
 #algorithm_div {
-    float: right;
     max-width: 480px;
+    width: 30vw;
 }
 
 #info_field {
@@ -58,11 +110,12 @@ div.inners {
 }
 
 canvas {
+    position: relative;
     border:1px solid #000;
+    margin: auto;
 }
 table, td {
     border: 1px solid black;
-    margin-bottom: 30px;
     border-spacing: 0;
     text-align: center;
     background-color: white;
