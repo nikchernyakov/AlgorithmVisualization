@@ -78,6 +78,7 @@ window.onload = function () {
     btnStop = document.getElementById("btnStop");
     btnStop.disabled = true;
     btnStop.addEventListener("click", function (event) {
+        clearTimeout(nextTimer);
         isStopped = true;
         btnStop.disabled = true;
         clearAlgorithmInfo();
@@ -229,7 +230,7 @@ window.onload = function () {
         // Draw vertices
         graph.nodes.forEach(function (node) {
             ctx.beginPath();
-            ctx.fillStyle = startVertex !== undefined && node.id === startVertex.id ? START_VERTEX_COLOR : node.color;
+            ctx.fillStyle = node.color;
             ctx.strokeStyle = BLACK_COLOR;
             ctx.arc(node.x, node.y, graph.vertexRange, 0, 2 * Math.PI);
             ctx.fill();
@@ -514,7 +515,6 @@ window.onload = function () {
     };
 
     var setFirstDistances = function () {
-        if(isPauseOrStop(setFirstDistances)) return;
         sendInfo("Set starting value of distances to all vertices<br>" +
             "For starting vertex the value is <b>0</b> to another vertices <b>INFINITY</b>");
         for(var i = 0; i < graph.nodes.length; i++){
@@ -531,7 +531,6 @@ window.onload = function () {
     };
     
     var checkVerticesStep = function () {
-        if(isPauseOrStop(checkVerticesStep)) return;
         currentVertex = getMinVertex();
         if(currentVertex === false) {
             sendInfo("All vertices is checked");
@@ -554,7 +553,6 @@ window.onload = function () {
     };
 
     var checkEdgesStep = function() {
-        if(isPauseOrStop(checkEdgesStep)) return;
         if(edges.length > 0) nextStep(checkEdgeStep, 2);
         else {
             sendInfo("All edges from this vertex is checked");
@@ -565,7 +563,6 @@ window.onload = function () {
     };
 
     var checkEdgeStep = function () {
-        if(isPauseOrStop(checkEdgeStep)) return;
         var edge = edges.pop();
         sendInfo("Edge from <b>" + edge.from + "</b> to <b>" + edge.to + "</b> with weight <b>" + edge.weight + "</b>");
         var newWeight = Number(distances[currentVertex]) + Number(edge.weight);
@@ -585,7 +582,6 @@ window.onload = function () {
     };
 
     var endDijkstra = function () {
-        if(isPauseOrStop(endDijkstra)) return;
         sendInfo("The algorithm is done working");
         render();
     };
