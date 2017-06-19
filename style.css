@@ -3,13 +3,13 @@ body {
     margin: 0;
 }
 
-#up_line {
+div.up_line {
     position: absolute;
     height: 30vh;
-    width: 100vw;
+    width: 100%;
     z-index: -1;
     background-color: #24454c;
-    overflow: auto;
+    overflow-y: hidden;
     overflow-x: hidden;
 }
 
@@ -60,10 +60,6 @@ header {
     transition-duration: 0s;
 }
 
-#btnNextStep:disabled{
-    visibility: hidden;
-}
-
 #btnSelectStartVertex{
     border-radius: 8px;
 }
@@ -73,9 +69,18 @@ th {
     background-color: #589ba4
 }
 
-div.sections {
+div.box {
+    position: absolute;
+    display: table;
     margin-top: 15vh;
-    float: left;
+    margin-left: 8%;
+    margin-right: 4%;
+}
+
+div.sections {
+    display: table-cell;
+    /*margin-top: 15vh;*/
+    /*float: left;*/
     background-color: #def2f3;
     text-align: center;
     border: 1px solid black;
@@ -88,18 +93,17 @@ div.inners {
 }
 
 #graph_div {
-    max-width: 200px;
-    width: 20vw;
-    margin-left: 6vw;
+    width: 200px;
 }
 
 #canvas_div{
-    width: 45vw;
+    width: 680px;
+    /*width: 45vw;*/
 }
 
 #algorithm_div {
-    max-width: 480px;
-    width: 30vw;
+    width: 400px;
+    /*width: 30vw;*/
 }
 
 #info_field {

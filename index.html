@@ -7,59 +7,62 @@
     <script src="main.js"></script>
 </head>
 <body>
-    <div id="up_line">
+    <div class="up_line" id="up_line">
         <header class="page_header"><h1 id="header">Visualisation of Algorithm Dijkstra</h1></header>
     </div>
-    <div class="sections" id="graph_div">
-        <header class="section_header"><h2> Graph section </h2></header>
-        <button class="button graph_btn" id="btnView" title="Move vertices in your graph">View</button>
-        <button class="button graph_btn" id="btnCreateVertex" title="Click on canvas">Create vertex</button>
-        <button class="button graph_btn" id="btnCreateEdge" title="Click on two vertices">Create edge</button>
-        <button class="button graph_btn" id="btnClearGraph" title="Delete all graph">Clear</button>
-        <button class="button graph_btn" id="btnCreateRandomGraph" title="Create random graph">Random Graph</button>
-    </div>
+    <div class="box">
+        <div class="sections" id="graph_div">
+            <header class="section_header"><h2> Graph section </h2></header>
+            <button class="button graph_btn" id="btnView" title="Move vertices in your graph">View</button>
+            <button class="button graph_btn" id="btnCreateVertex" title="Click on canvas">Create vertex</button>
+            <button class="button graph_btn" id="btnCreateEdge" title="Click on two vertices">Create edge</button>
+            <button class="button graph_btn" id="btnClearGraph" title="Delete all graph">Clear</button>
+            <button class="button graph_btn" id="btnCreateRandomGraph" title="Create random graph">Random Graph</button>
+            <button class="button graph_btn" id="btnSelectStartVertex" title="Select vertex that will be starting">
+                Select start vertex
+            </button>
+        </div>
 
-    <div class="sections" id="canvas_div">
-        <header class="section_header" ><h2> Canvas section </h2></header>
-        <canvas id="canvas" width="640" height="480"> Update your browser </canvas>
-    </div>
-    <div class="sections" id="algorithm_div">
-        <header class="section_header"><h2> Algorithm section </h2></header>
-        <button class="button algo_btn" id="btnStart" title="Start the algorithm">Start</button>
-        <button class="button algo_btn" id="btnPause">Pause</button>
-        <button class="button algo_btn" id="btnStop">Stop</button>
-        <button class="button algo_btn" id="btnNextStep">Next step</button>
-        <button class="button" id="btnSelectStartVertex" title="Select vertex that will be starting">
-            Select start vertex
-        </button>
-        <h4>Speed:</h4>
-        <select id="speed_select">
-            <optgroup label="Speed">
-                <option value="0.5">0.5x</option>
-                <option selected value="1">1x</option>
-                <option value="2">2x</option>
-            </optgroup>
-        </select>
+        <div class="sections" id="canvas_div">
+            <header class="section_header" ><h2> Canvas section </h2></header>
+            <canvas id="canvas" width="640" height="480"> Update your browser </canvas>
+        </div>
+        <div class="sections" id="algorithm_div">
+            <header class="section_header"><h2> Algorithm section </h2></header>
+            <button class="button algo_btn" id="btnStart" title="Start the algorithm">Start</button>
+            <button class="button algo_btn" id="btnPause">Pause</button>
+            <button class="button algo_btn" id="btnStop">Stop</button>
+            <button class="button algo_btn" id="btnNextStep" title="This button work when algorithm is paused">Next step</button>
+            <h4>Speed:</h4>
+            <select id="speed_select">
+                <optgroup label="Speed">
+                    <option value="0.5">0.5x</option>
+                    <option selected value="1">1x</option>
+                    <option value="2">2x</option>
+                </optgroup>
+            </select>
 
             <div class="inners">
-            <h3>Distances</h3>
-            <table id="distances">
-                <tr id="tr_id">
-                    <th><b>Vertex ID</b></th>
-                </tr>
-                <tr id="tr_distances">
-                    <th><b>Distance</b></th>
-                </tr>
-                <tr id="tr_prev_vertex">
-                    <th><b>PrevVertex</b></th>
-                </tr>
-            </table>
-        </div>
-        <div class="inners">
-            <h3>Info</h3>
-            <p id="info_field">
-                Here you will be able to see information about algorithm work process...
-            </p>
+                <h3>Distances</h3>
+                <table id="distances">
+                    <tr id="tr_id">
+                        <th><b>Vertex ID</b></th>
+                    </tr>
+                    <tr id="tr_distances">
+                        <th><b>Distance</b></th>
+                    </tr>
+                    <tr id="tr_prev_vertex">
+                        <th><b>PrevVertex</b></th>
+                    </tr>
+                </table>
+             </div>
+            <div class="inners">
+                <h3>Info</h3>
+                <p id="info_field">
+                    Here you will be able to see information about algorithm work process... <br>
+                    Select <b>Start vertex</b> and press <b>Start</b> to begin the algorithm
+                </p>
+            </div>
         </div>
     </div>
 </body>

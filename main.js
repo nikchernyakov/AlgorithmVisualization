@@ -110,15 +110,13 @@ window.onload = function () {
     btnPause.disabled = true;
     btnPause.addEventListener("click", function (event) {
         if(isPaused){ // If click when algorithm is pausing
-            isPaused = false;
-            btnStart.disabled = false;
+            changeContinueButton();
             nextStep(currentStep, 1);
-            btnPause.innerHTML = "Pause";
         } else{ // If click when algorithm is working
             isPaused = true;
-            btnStart.disabled = true;
+            btnNextStep.disabled = false;
             btnPause.innerHTML = "Continue";
-            clearTimeout(nextStep);
+            clearTimeout(nextTimer);
         }
     }, false);
 
@@ -130,7 +128,10 @@ window.onload = function () {
         btnStop.disabled = true;
         isPaused = false;
         btnStart.disabled = false;
+        changeContinueButton();
+        btnPause.disabled = true;
         clearAlgorithmInfo();
+        sendInfo("Select <b>Start vertex</b> and press <b>Start</b> to begin the algorithm");
         setGraphBtnsDisabledProperty(false);  // Switch off graph buttons for disable graph changes
         render();
     }, false);
@@ -138,7 +139,8 @@ window.onload = function () {
     btnNextStep = document.getElementById("btnNextStep");
     btnNextStep.disabled = true;
     btnNextStep.addEventListener("click", function (event) {
-
+        isSkipped = true;
+        nextStep(currentStep);
     }, false);
 
     btnSelectStartVertex = document.getElementById("btnSelectStartVertex");
@@ -164,7 +166,7 @@ window.onload = function () {
     };
 
     // Buttons from graph div
-    graphBtns = [btnView, btnCreateVertex, btnCreateEdge, btnCreateRandomGraph, btnClearGraph];
+    graphBtns = [btnView, btnCreateVertex, btnCreateEdge, btnCreateRandomGraph, btnClearGraph, btnSelectStartVertex];
 
     // Change disabled property for all graph buttons
     var setGraphBtnsDisabledProperty = function(bool) {
@@ -174,11 +176,11 @@ window.onload = function () {
         if(bool){
             // Change style for disabled buttons
             currentBtn.style = prevStyle;
-            btnSelectStartVertex.style.visibility = "hidden";
+            //btnSelectStartVertex.style.visibility = "hidden";
         }
         else {
             // Return previous buttons style
-            btnSelectStartVertex.style.visibility = "visible";
+            //btnSelectStartVertex.style.visibility = "visible";
             setStyleToCurrentButton(currentBtn);
         }
     };
@@ -444,7 +446,10 @@ window.onload = function () {
                 prevColor: prevColor
             };
         } else {
-            var weight = prompt("Enter edge's weight");
+            var weight = prompt("Enter edge's weight (Maximum is 30):");
+            while(Number.isNaN(Number(weight)) || Number(weight) > 30){
+                weight = prompt("Enter edge's weight (Maximum is 30):")
+            }
 
             if (weight) {
                 var firstId = firstSelectedNode.node.id,
@@ -595,19 +600,34 @@ window.onload = function () {
         currentStep,
         isStopped = false,
         isPaused = false,
+        isSkipped = false,
+        changeContinueButton,
         isPauseOrStop,
         currentVertex,
-        edges;
+        edges,
+        edge,
+        prevColor;
 
     speedSelect = document.getElementById("speed_select");
     getSpeed = function () {
         return Number(speedSelect.options[speedSelect.options.selectedIndex].value);
     };
 
+    changeContinueButton = function () {
+        isPaused = false;
+        btnNextStep.disabled = true;
+        btnPause.innerHTML = "Pause";
+    };
+
     // Do function after any time
-    nextStep = function (func, timeInSec, edge, prevColor) {
-        if(isPauseOrStop(func)) return;
-        nextTimer = setTimeout(func, timeInSec*1000*(1/getSpeed()), edge, prevColor);
+    nextStep = function (func, timeInSec) {
+        if(isSkipped){
+            isSkipped = false;
+            func();
+            return;
+        } else if(isPauseOrStop(func)) return;
+
+        nextTimer = setTimeout(func, timeInSec*1000*(1/getSpeed()));
     };
 
     isPauseOrStop = function (func) {
@@ -664,7 +684,7 @@ window.onload = function () {
     };
 
     var checkEdgesStep = function() {
-        if(edges.length > 0) nextStep(checkEdgeStep, 2);
+        if(edges.length > 0) checkEdgeStep();
         else {
             sendInfo("All edges from this vertex is checked");
             graph.setNodeColor(currentVertex,(currentVertex !== startVertex.id)
@@ -674,20 +694,23 @@ window.onload = function () {
     };
 
     var checkEdgeStep = function () {
-        var edge = edges.pop();
+        edge = edges.pop();
         // if vertex with ID edge.to is visited
-        if(flags[edge.to]){
-            nextStep(checkEdgesStep, 3);
-            return;
+        while(flags[edge.to]){
+            edge = edges.pop();
+            if(edge === undefined) {
+                checkEdgesStep();
+                return;
+            }
         }
 
         sendInfo("Edge from <b>" + edge.from + "</b> to <b>" + edge.to + "</b> with weight <b>" + edge.weight + "</b>");
-        var prevColor = graph.getNode(edge.to).color;
+        prevColor = graph.getNode(edge.to).color;
         graph.setNodeColor(edge.to, ADJACENCY_VERTEX_COLOR);
-        nextStep(checkDistancesStep, 3, edge, prevColor);
+        nextStep(checkDistancesStep, 3);
     };
 
-    var checkDistancesStep = function (edge, prevColor) {
+    var checkDistancesStep = function () {
         var newDistance = Number(distances[currentVertex]) + Number(edge.weight);
         if(newDistance < distances[edge.to]) {
             var message = "Distance from this edge less then previous edge: <b>" + newDistance + " < ";
@@ -710,11 +733,12 @@ window.onload = function () {
     };
 
     var endDijkstra = function () {
-        sendInfo("The algorithm is done working");
+        sendInfo("<b>The algorithm is done working</b>");
         // Block and unblock buttons
         isStopped = false;
         btnPause.disabled = true;
         isPaused = false;
+        changeContinueButton();
     };
 
     render();
