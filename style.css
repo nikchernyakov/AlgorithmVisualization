@@ -60,6 +60,10 @@ header {
     transition-duration: 0s;
 }
 
+#btnNextStep:disabled{
+    visibility: hidden;
+}
+
 #btnSelectStartVertex{
     border-radius: 8px;
 }

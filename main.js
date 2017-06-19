@@ -1,5 +1,6 @@
 window.onload = function () {
 
+    // Colors
     var COLOR_1 = "#1093a7",
         COLOR_2 = "#24454c",
         COLOR_3 = "#def2f3",
@@ -16,33 +17,39 @@ window.onload = function () {
         DEFAULT_VERTEX_COLOR = "#ffffff",
         DEFAULT_EDGE_COLOR = "#000";
 
+    // Canvas variables
     var canvas,
         ctx,
         graph,
         render,
         dragNode,
         dragPoint,
-        firstSelectedNode = undefined,
-        startVertex = undefined;
+        firstSelectedNode = undefined, // First selected node in "create edge"
+        startVertex = undefined; // Start vertex for algorithm
 
-    var idRow,
-        distancesRow,
-        prevVertexRow,
+    // Info div
+    var idRow, // First row in table with id
+        distancesRow, // Second row in table with distances
+        prevVertexRow, // // Third row in table with id of prev
         infoField,
         sendInfo,
         clearInfo;
 
+    // In algorithm div info field
     infoField = document.getElementById("info_field");
+    // Add info to info field
     sendInfo = function (info) {
         infoField.innerHTML += "> " + info + "<br>";
-        infoField.scrollTop = 9999;
+        infoField.scrollTop = 9999; // Scroll to last string in field
     };
+    // Delete all info in field
     clearInfo = function () {
         infoField.innerHTML = "";
     };
 
-    var currentBtn,
-        prevStyle,
+    // Buttons
+    var currentBtn, // Current selected button
+        prevStyle, // Previous style of current button
         btnCreateVertex,
         btnCreateEdge,
         btnStart,
@@ -50,10 +57,14 @@ window.onload = function () {
         btnStop,
         btnView,
         btnClearGraph,
+        btnNextStep,
         btnSelectStartVertex,
         btnCreateRandomGraph,
-        graphBtns;
+        graphBtns; // Buttons from graph div
 
+    /*
+        GRAPH DIV BUTTONS
+    */
     btnCreateVertex = document.getElementById('btnCreateVertex');
     btnCreateVertex.addEventListener("click", function (event) {
         changeCurrentButton(btnCreateVertex);
@@ -75,6 +86,14 @@ window.onload = function () {
         render();
     }, false);
 
+    btnCreateRandomGraph = document.getElementById("btnCreateRandomGraph");
+    btnCreateRandomGraph.addEventListener("click", function (event) {
+        createRandomGraph();
+    }, false);
+
+    /*
+     Algorithm DIV BUTTONS
+     */
     btnStart = document.getElementById("btnStart");
     btnStart.disabled = true;
     btnStart.addEventListener("click", function (event) {
@@ -90,12 +109,12 @@ window.onload = function () {
     btnPause = document.getElementById("btnPause");
     btnPause.disabled = true;
     btnPause.addEventListener("click", function (event) {
-        if(isPaused){
+        if(isPaused){ // If click when algorithm is pausing
             isPaused = false;
             btnStart.disabled = false;
             nextStep(currentStep, 1);
             btnPause.innerHTML = "Pause";
-        } else{
+        } else{ // If click when algorithm is working
             isPaused = true;
             btnStart.disabled = true;
             btnPause.innerHTML = "Continue";
@@ -112,77 +131,88 @@ window.onload = function () {
         isPaused = false;
         btnStart.disabled = false;
         clearAlgorithmInfo();
-        setGraphBtnsDisabledProperty(false);
+        setGraphBtnsDisabledProperty(false);  // Switch off graph buttons for disable graph changes
         render();
     }, false);
 
-    var clearAlgorithmInfo = function () {
-        clearInfo();
-        recreateAlgorithmExtraInfo();
-        for(var i = 0; i < graph.nodes.length; i++){
-            graph.setNodeColor(i, DEFAULT_VERTEX_COLOR);
-            distancesRow.cells[i + 1].innerHTML = "";
-            prevVertexRow.cells[i + 1].innerHTML = "";
-        }
-        startVertex.color = START_VERTEX_COLOR;
+    btnNextStep = document.getElementById("btnNextStep");
+    btnNextStep.disabled = true;
+    btnNextStep.addEventListener("click", function (event) {
 
-        for(var i = 0; i < graph.edges.length; i++){
-            graph.setEdgeColor(i, DEFAULT_EDGE_COLOR);
-        }
-    };
-    
+    }, false);
+
     btnSelectStartVertex = document.getElementById("btnSelectStartVertex");
     btnSelectStartVertex.addEventListener("click", function (event) {
         changeCurrentButton(btnSelectStartVertex);
     }, false);
 
-    btnCreateRandomGraph = document.getElementById("btnCreateRandomGraph");
-    btnCreateRandomGraph.addEventListener("click", function (event) {
-        createRandomGraph();
-    }, false);
+    var clearAlgorithmInfo = function () {
+        clearInfo();
+        recreateAlgorithmExtraInfo();
+        // Clean table
+        for(var i = 0; i < graph.nodes.length; i++){
+            graph.setNodeColor(i, DEFAULT_VERTEX_COLOR); // Return back default color for vertices
+            distancesRow.cells[i + 1].innerHTML = "";
+            prevVertexRow.cells[i + 1].innerHTML = "";
+        }
+        startVertex.color = START_VERTEX_COLOR;
 
+        // Return back default color for edges
+        for(var i = 0; i < graph.edges.length; i++){
+            graph.setEdgeColor(i, DEFAULT_EDGE_COLOR);
+        }
+    };
+
+    // Buttons from graph div
     graphBtns = [btnView, btnCreateVertex, btnCreateEdge, btnCreateRandomGraph, btnClearGraph];
 
+    // Change disabled property for all graph buttons
     var setGraphBtnsDisabledProperty = function(bool) {
         graphBtns.forEach(function(btn) {
             btn.disabled = bool;
         });
         if(bool){
+            // Change style for disabled buttons
             currentBtn.style = prevStyle;
             btnSelectStartVertex.style.visibility = "hidden";
         }
         else {
+            // Return previous buttons style
             btnSelectStartVertex.style.visibility = "visible";
-            setStyleOfCurrentButton(currentBtn);
+            setStyleToCurrentButton(currentBtn);
         }
     };
 
-    var setStyleOfCurrentButton = function (btn) {
+    // Set style to current button
+    var setStyleToCurrentButton = function (btn) {
         prevStyle = btn.style;
         btn.style.backgroundColor = "#ffffff";
         btn.style.border = "2px solid #589ba4";
         btn.cssText += "-webkit-transition-duration: 0s; transition-duration: 0s;";
     };
 
-    currentBtn = btnView;
-    setStyleOfCurrentButton(currentBtn);
+    currentBtn = btnView; // First current button is btnView
+    setStyleToCurrentButton(currentBtn);
 
-
+    // Change current button for new one
     var changeCurrentButton = function (button) {
+        // If one vertices was picked in "Create edge" mode
         if(firstSelectedNode !== undefined) firstSelectedNode.node.color = firstSelectedNode.prevColor;
         firstSelectedNode = undefined;
         render();
 
-        currentBtn.style = prevStyle;
+        currentBtn.style = prevStyle; // Return previous style to previous current button
+        // Change current button
         currentBtn = button;
-        setStyleOfCurrentButton(currentBtn);
+        setStyleToCurrentButton(currentBtn);
     };
 
     var clearGraph = function () {
-        graph = Graph();
+        graph = Graph(); // Create new graph
         startVertex = undefined;
         btnStart.disabled = true;
 
+        // Delete all vertices from the table
         [idRow, distancesRow, prevVertexRow].forEach(function(row) {
             for(var i = row.cells.length - 1 ; i >= 1; i--){
                 row.deleteCell(i);
@@ -201,6 +231,7 @@ window.onload = function () {
           // Vertex's radius
           vertexRange: 30,
 
+          // Create new vertices
           createNode: function(pos, id) {
               return {
                   x: pos.x,
@@ -211,25 +242,18 @@ window.onload = function () {
               }
           },
 
+          // Find vertex in graph by ID
           getNode: function (ind) {
             return this.nodes[ind];
           },
 
+          // Set new color for vertex
           setNodeColor: function (ind, color) {
               this.nodes[ind].color = color;
               render();
           },
 
-          /*createEdge: function(from, to, weight) {
-              return {
-                  id: this.edges.length,
-                  color: black,
-                  from: Number(from),
-                  to: Number(to),
-                  weight: Number(weight)
-              }
-          },*/
-
+          // Create new edge
           createEdge: function(from, to, weight, id) {
               return {
                   id: Number(id),
@@ -239,7 +263,8 @@ window.onload = function () {
                   weight: Number(weight)
               }
           },
-          
+
+          // Set new color for edge
           setEdgeColor: function (ind, color) {
               this.edges[ind].color = color;
               render();
@@ -258,9 +283,8 @@ window.onload = function () {
 
     ctx = canvas.getContext('2d');
 
-    // Canvas render
+    // Redraw canvas and his elements
     render = function () {
-
         // Clear canvas
         ctx.fillStyle = WHITE_COLOR;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -298,7 +322,7 @@ window.onload = function () {
         });
     };
 
-
+    // Find node in graph by ID
     var getNodeById = function (id) {
         var result = undefined;
         graph.nodes.forEach(function (node) {
@@ -309,7 +333,7 @@ window.onload = function () {
         return result;
     };
 
-    // Получает из события мыши координаты, относительно левого верхнего угла канвы.
+    // Get from mouse event coordinates relatively left-top corner of canvas
     var getMousePosFromEvent = function (evt) {
         var rect = canvas.getBoundingClientRect();
         return {
@@ -318,7 +342,7 @@ window.onload = function () {
         };
     };
 
-    // Находит узел, находящийся по заданой координате на канве.
+    // Find node by coordinates on canvas
     var getNodeByPos = function (pos) {
         var result = undefined;
         graph.nodes.forEach(function (node) {
@@ -330,15 +354,17 @@ window.onload = function () {
         return result;
     };
 
-    // При нажатии кнопки мыши находим узел по которому было нажатие,
-    // запоминаем его в dragNode для дальнейшего использования,
-    // в dragPoint запоминаем по какому месту узла была нажата кнопка мыши.
+    // When the mouse is pressed find node and remember that in dragNode
+    // dragPoint remember what place in node was pressed
     canvas.addEventListener('mousedown', function (event) {
+        // This function need only for "View" mode
+        // For trace node moving
         if (currentBtn !== btnView) {
             return;
         }
         var pos = getMousePosFromEvent(event);
         dragNode = getNodeByPos(pos);
+        // Find dragPoint
         if (dragNode !== undefined) {
             dragPoint = {
                 x: pos.x - dragNode.x,
@@ -347,12 +373,12 @@ window.onload = function () {
         }
     }, false);
 
-    // При отпускании кпнопки мыши забываем текущий перетаскиваемый узел.
+    // When the mouse is depressed, forgot current dragNode
     canvas.addEventListener('mouseup', function () {
         dragNode = undefined;
     }, false);
 
-    // При движении мыши, если есть перетаскиваемый узел, двигаем его и перерисовываем канву.
+    // Change node coordinate if it was moved and redraw it
     canvas.addEventListener('mousemove', function (event) {
         var pos;
         if (dragNode !== undefined) {
@@ -363,6 +389,7 @@ window.onload = function () {
         }
     }, false);
 
+    // Do action relatively current button mode
     canvas.addEventListener('click', function (event) {
         var pos = getMousePosFromEvent(event);
         switch (currentBtn.id) {
@@ -382,31 +409,36 @@ window.onload = function () {
     }, false);
 
     var createVertex = function (pos) {
+        // Add new vertex in table
         var id = graph.nodes.length;
         var header = idRow.insertCell(id + 1);
         header.innerHTML = "<b>" + id.toString() + "</b>";
         distancesRow.insertCell(id + 1);
         prevVertexRow.insertCell(id + 1);
 
+        // Add new vertex in graph
         graph.nodes.push(graph.createNode(pos, id));
     };
     
     var addEdgeToGraph = function (from, to, weight) {
         var edge1 = graph.createEdge(from, to, Number(weight), graph.edges.length),
             edge2 = graph.createEdge(to, from, Number(weight), graph.edges.length);
+        // Add edge in two vertex because the edges in graph have two ways
         graph.nodes[from].edges.push(edge1);
         graph.nodes[to].edges.push(edge2);
         graph.edges.push(edge1);
     };
     
     var createEdge = function (pos) {
+        // Find clicked node
         var node = getNodeByPos(pos);
-        if(node === undefined) return;
+        if(node === undefined || (firstSelectedNode !== undefined && node.id === firstSelectedNode.node.id)) return;
 
+        // Set current color to this vertex
         var prevColor = node.color;
         node.color = CURRENT_VERTEX_COLOR;
 
-        if (firstSelectedNode === undefined) {
+        if (firstSelectedNode === undefined) { // If it is first choosing vertex
             firstSelectedNode = {
                 node: node,
                 prevColor: prevColor
@@ -420,6 +452,8 @@ window.onload = function () {
 
                 addEdgeToGraph(firstId, secondId, weight);
             }
+
+            // Forgot this vertices
             firstSelectedNode.node.color = firstSelectedNode.prevColor;
             node.color = prevColor;
             firstSelectedNode = undefined;
@@ -427,20 +461,24 @@ window.onload = function () {
     };
 
     var selectStartVertex = function (pos) {
+        // Forgot previous vertex
         if(startVertex !== undefined) startVertex.color = DEFAULT_VERTEX_COLOR;
         startVertex = getNodeByPos(pos);
+
         if(startVertex === undefined) return;
         startVertex.color = START_VERTEX_COLOR;
-        btnStart.disabled = false;
+        btnStart.disabled = false; // Open button start
     };
 
     var createRandomGraph = function () {
         clearGraph();
 
+        // Ask vertex count
         var vertexCount;
         while((vertexCount = prompt("Enter vertices count (Maximum is 10)")) > 10);
         if(!vertexCount) return;
 
+        // Save vertices position to colibrate their
         var verticesPos = [];
 
         var getRandomValue = function (limit) {
@@ -450,7 +488,9 @@ window.onload = function () {
         var compareCoordinateForCompatibility = function (pos1, pos2, withWhat) {
             return Math.pow(pos1.x - pos2.x, 2) + Math.pow(pos1.y - pos2.y, 2) > withWhat * withWhat;
         };
+
         var getRandomPos = function() {
+            // For vertices don't touch the borders of canvas
             var checkBorders = function (pos) {
                 var range = graph.vertexRange * 2;
 
@@ -473,6 +513,7 @@ window.onload = function () {
                 y: getRandomValue(canvas.height)
             });
         };
+
         var checkPosCompatibility = function (pos) {
             var check = true;
             verticesPos.forEach(function(iter) {
@@ -491,12 +532,13 @@ window.onload = function () {
             createVertex(pos);
         }
 
-        // Create adjacency matrix to trace for enable edges
+        // Create adjacency matrix to generate random edges
         var adjacencyMatrix = new Array(vertexCount);
         for(var i = 0; i < vertexCount; i++){
             adjacencyMatrix[i] = new Array(vertexCount);
         }
-        // Fill matrix all true without diagonal
+
+        // For all pair of different vertices generate edges (If random want it)
         for(var i = 0; i < vertexCount; i++){
             for(var j = i; j < vertexCount; j++){
                 if(i !== j && getRandomValue(2)){
@@ -504,10 +546,10 @@ window.onload = function () {
                 }
             }
         }
-
         render();
     };
 
+    // Arrays for algorithm (Extra info)
     var distances,
         flags,
         edgesIdToPrevVertex;
@@ -520,6 +562,7 @@ window.onload = function () {
 
     var INFINITY_CHAR = "&#8734";
 
+    // --Set values to array and table
     var setDistance = function(ind, num) {
         distancesRow.cells[ind + 1].innerHTML = num !== Number.MAX_VALUE ? num.toString() : INFINITY_CHAR;
         distances[ind] = Number(num);
@@ -528,6 +571,7 @@ window.onload = function () {
     var setPrevVertex = function(to, from) {
         prevVertexRow.cells[to + 1].innerHTML = from.toString();
     };
+    // --
 
     var getMinVertex = function() {
         var min = Number.MAX_VALUE;
@@ -543,7 +587,8 @@ window.onload = function () {
         return (min < Number.MAX_VALUE) ? index : false;
     };
 
-    var speedSelect,
+    // Variables for algorithm
+    var speedSelect, // What speed of algorithm
         getSpeed,
         nextStep,
         nextTimer,
@@ -559,6 +604,7 @@ window.onload = function () {
         return Number(speedSelect.options[speedSelect.options.selectedIndex].value);
     };
 
+    // Do function after any time
     nextStep = function (func, timeInSec, edge, prevColor) {
         if(isPauseOrStop(func)) return;
         nextTimer = setTimeout(func, timeInSec*1000*(1/getSpeed()), edge, prevColor);
@@ -572,6 +618,7 @@ window.onload = function () {
     var startDijkstra = function() {
         setGraphBtnsDisabledProperty(true);
         clearAlgorithmInfo();
+
         sendInfo("Start algorithm...");
         nextStep(setFirstDistances, 1);
     };
@@ -579,9 +626,9 @@ window.onload = function () {
     var setFirstDistances = function () {
         sendInfo("Set starting value of distances to all vertices<br>" +
             "For starting vertex the value is <b>0</b> to another vertices <b>INFINITY</b>");
+        // Set starting value of distances to all vertices
         for(var i = 0; i < graph.nodes.length; i++){
             setDistance(i, Number.MAX_VALUE);
-            edgesIdToPrevVertex[i] = undefined;
             flags[i] = false;
         }
         edgesIdToPrevVertex = new Array(graph.nodes.length);
@@ -594,16 +641,19 @@ window.onload = function () {
     
     var checkVerticesStep = function () {
         currentVertex = getMinVertex();
+        // If all vertices is checked
         if(currentVertex === false) {
             sendInfo("All vertices is checked");
             nextStep(endDijkstra, 3);
             return;
         }
+
         sendInfo("Choosing the vertex with minimal distance...<br>" +
             "ID of vertex with minimal distance is: <b>" + currentVertex + "</b>");
         flags[currentVertex] = true;
         graph.setNodeColor(currentVertex, CURRENT_VERTEX_COLOR);
 
+        // Create edges array
         edges = [];
         graph.getNode(currentVertex).edges.forEach(function(edge) {
             edges.push(graph.createEdge(edge.from, edge.to, edge.weight, edge.id));
@@ -625,10 +675,12 @@ window.onload = function () {
 
     var checkEdgeStep = function () {
         var edge = edges.pop();
+        // if vertex with ID edge.to is visited
         if(flags[edge.to]){
             nextStep(checkEdgesStep, 3);
             return;
         }
+
         sendInfo("Edge from <b>" + edge.from + "</b> to <b>" + edge.to + "</b> with weight <b>" + edge.weight + "</b>");
         var prevColor = graph.getNode(edge.to).color;
         graph.setNodeColor(edge.to, ADJACENCY_VERTEX_COLOR);
@@ -643,6 +695,7 @@ window.onload = function () {
             sendInfo(message + "</b>");
             setDistance(edge.to, newDistance);
             setPrevVertex(edge.to, edge.from);
+            // Change previous vertex
             if(edgesIdToPrevVertex[edge.to] !== undefined)
                 graph.setEdgeColor(edgesIdToPrevVertex[edge.to], VISIT_EDGE_COLOR);
             edgesIdToPrevVertex[edge.to] = edge.id;
@@ -658,8 +711,7 @@ window.onload = function () {
 
     var endDijkstra = function () {
         sendInfo("The algorithm is done working");
-        btnStart.disabled = false;
-        btnStop.disabled = true;
+        // Block and unblock buttons
         isStopped = false;
         btnPause.disabled = true;
         isPaused = false;
